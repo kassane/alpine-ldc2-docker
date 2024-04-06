@@ -27,7 +27,7 @@ RUN cd ldc \
     -DLLVM_IS_SHARED=OFF \
     && cmake --build build --parallel
 
-RUN ninja -C ldc-1.37.0-src/build install \
+RUN ninja -C ldc/build install \
     && apk del ldc llvm-static llvm-libunwind-static clang \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2
