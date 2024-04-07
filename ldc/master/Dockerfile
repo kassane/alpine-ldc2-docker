@@ -15,7 +15,7 @@ RUN apk update && apk add --no-cache \
         llvm-static \
         llvm-libunwind-static
 
-RUN git clone --recursive https://github.com/ldc-developers/ldc --depth=1
+RUN git clone --recursive https://github.com/kassane/ldc -b musl_fix --depth=1
 RUN cd ldc \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt" \
@@ -40,6 +40,7 @@ RUN ninja -C ldc/build install \
 #     && mv $PWD/bin/dub /usr/bin/dub
 
 RUN apk del cmake ninja git \
+    && apk add llvm-libunwind-dev musl-dev gcc \
     && rm -fr ldc
 
 WORKDIR /app
