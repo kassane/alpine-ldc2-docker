@@ -25,7 +25,8 @@ RUN cd ldc \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
-    && cmake --build build --parallel
+    && cmake --build build --parallel \
+    && ninja -C build install
 
 RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
@@ -34,12 +35,9 @@ RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && apk del dub \
     && mv $PWD/bin/dub /usr/bin/dub
 
-RUN ninja -C ldc/build install \
-    && apk del ldc llvm-static llvm-libunwind-static clang \
+RUN apk del ldc llvm-static llvm-libunwind-static clang cmake ninja git \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
-    && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2
-
-RUN apk del cmake ninja git \
+    && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
     && apk add llvm-libunwind-dev musl-dev gcc \
     && rm -fr ldc dub
 
