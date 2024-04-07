@@ -27,17 +27,17 @@ RUN cd ldc \
     -DLLVM_IS_SHARED=OFF \
     && cmake --build build --parallel
 
-RUN ninja -C ldc/build install \
-    && apk del ldc llvm-static llvm-libunwind-static clang \
-    && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
-    && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2
-
-RUN git https://github.com/dlang/dub --depth=1 \
+RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
     && dub build -b release --compiler=/opt/bin/ldc2 \
     && chmod +x $PWD/bin/dub \
     && apk del dub \
     && mv $PWD/bin/dub /usr/bin/dub
+
+RUN ninja -C ldc/build install \
+    && apk del ldc llvm-static llvm-libunwind-static clang \
+    && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
+    && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2
 
 RUN apk del cmake ninja git \
     && apk add llvm-libunwind-dev musl-dev gcc \
