@@ -38,9 +38,11 @@ RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && apk del dub \
     && mv $PWD/bin/dub /usr/bin/dub
 
-RUN apk del ldc llvm-static llvm-libunwind-static clang cmake ninja git \
+RUN apk del ldc llvm-static clang cmake ninja git \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
+    && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
+    && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
     && apk add llvm-libunwind-dev musl-dev gcc \
     && rm -fr ldc dub
 

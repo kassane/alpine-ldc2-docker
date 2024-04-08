@@ -24,23 +24,33 @@ RUN cd ldc-1.37.0-src \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
-    && cmake --build build --parallel
+    -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
+    -DBUILD_SHARED_LIBS=BOTH \
+    -DBUILD_LTO_LIBS=ON \
+    && ninja -C ldc-1.37.0-src/build install
 
-RUN ninja -C ldc-1.37.0-src/build install \
-    && apk del ldc llvm-static llvm-libunwind-static clang \
+RUN wget -q -c https://github.com/dlang/dub/archive/refs/tags/v1.37.0.tar.gz \
+    && tar xf v1.37.0.tar.gz \
+    && cd dub-1.37.0 \
+    && dub build -b release --compiler=/opt/bin/ldc2 \
+    && chmod +x $PWD/bin/dub \
+    && apk del dub \
+    && mv $PWD/bin/dub /usr/bin/dub
+
+RUN apk del ldc llvm-static clang cmake ninja \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
-    && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2
+    && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
+    && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
+    && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
+    && apk add llvm-libunwind-dev musl-dev gcc \
+    && rm -fr ldc dub
 
-# RUN wget -q -c https://github.com/dlang/dub/archive/refs/tags/v1.37.0.tar.gz \
-#     && tar xf v1.37.0.tar.gz \
-#     && cd dub-1.37.0 \
-#     && dub build -b release --compiler=/opt/bin/ldc2 \
-#     && chmod +x $PWD/bin/dub \
-#     && apk del dub \
-#     && mv $PWD/bin/dub /usr/bin/dub
 
 RUN apk del cmake ninja \
-    && rm -fr ldc-1.37.0-src*
+    && rm -fr \
+    ldc-1.37.0-src \
+    *.tar.gz \
+    dub-1.37.0
 
 WORKDIR /app
 
