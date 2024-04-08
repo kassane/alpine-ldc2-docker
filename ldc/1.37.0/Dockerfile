@@ -27,6 +27,7 @@ RUN cd ldc-1.37.0-src \
     -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
     -DBUILD_SHARED_LIBS=BOTH \
     -DBUILD_LTO_LIBS=ON \
+    && cmake --build build --parallel \
     && ninja -C ldc-1.37.0-src/build install
 
 RUN wget -q -c https://github.com/dlang/dub/archive/refs/tags/v1.37.0.tar.gz \
