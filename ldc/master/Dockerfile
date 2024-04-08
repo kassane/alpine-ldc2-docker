@@ -25,6 +25,9 @@ RUN cd ldc \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
+    -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
+    -DBUILD_SHARED_LIBS=BOTH \
+    -DBUILD_LTO_LIBS=ON \
     && cmake --build build --parallel \
     && ninja -C build install
 
