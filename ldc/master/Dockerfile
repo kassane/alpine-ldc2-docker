@@ -8,7 +8,6 @@ RUN apk update && apk add --no-cache \
         ldc \
         git \
         clang \
-        compiler-rt \
         dub \
         cmake \
         ninja \
@@ -16,7 +15,7 @@ RUN apk update && apk add --no-cache \
         llvm-static \
         llvm-libunwind-static
 
-RUN git clone --recursive https://github.com/kassane/ldc -b alpine --depth=1
+RUN git clone --recursive https://github.com/kassane/ldc -b musl_fix --depth=1
 RUN cd ldc \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt" \
@@ -25,7 +24,6 @@ RUN cd ldc \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DCMAKE_BUILD_TYPE=Release \
     -DRT_SUPPORT_SANITIZERS=ON \
-    -DMULTILIB=ON \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
     -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
