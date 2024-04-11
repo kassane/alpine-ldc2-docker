@@ -23,7 +23,10 @@ RUN cd ldc \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DCMAKE_BUILD_TYPE=Release \
+    -DMULTILIB=ON \
+    -DRT_SUPPORT_SANITIZERS=ON \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
+    -DJITRT_EXTRA_LDFLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
     -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
     -DBUILD_SHARED_LIBS=BOTH \
