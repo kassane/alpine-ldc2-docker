@@ -17,6 +17,7 @@ on:
 
 jobs:
   docker:
+    name: D-LDC CI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -47,7 +48,7 @@ jobs:
         with:
           file: ldc/master/Dockerfile
           context: .
-          platforms: linux/amd64,linux/i386,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:latest
 
@@ -74,7 +75,7 @@ jobs:
         with:
           file: opend-ldc/master/Dockerfile
           context: .
-          platforms: linux/amd64,linux/i386,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-opend:latest
 

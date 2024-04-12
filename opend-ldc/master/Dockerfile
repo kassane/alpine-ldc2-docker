@@ -23,7 +23,6 @@ RUN cd opend/ldc \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DCMAKE_BUILD_TYPE=Release \
-    -DRT_SUPPORT_SANITIZERS=ON \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
     -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
