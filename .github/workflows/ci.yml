@@ -42,14 +42,23 @@ jobs:
       #     push: true
       #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:1.37.0
 
-      - name: Build and push - Alpine [master]
+      # - name: Build and push - Alpine [master]
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     file: ldc/master/Dockerfile
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:latest
+      
+      - name: Build and push - Alpine-openD [master]
         uses: docker/build-push-action@v5
         with:
-          file: ldc/master/Dockerfile
+          file: opend-ldc/master/Dockerfile
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-opend:latest
 
   keepalive-job:
     name: Keepalive Workflow
