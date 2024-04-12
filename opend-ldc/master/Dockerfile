@@ -45,7 +45,7 @@ RUN apk del ldc llvm-static clang cmake ninja git \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
     && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
     && apk add llvm-libunwind-dev musl-dev gcc \
-    && rm -fr ldc dub
+    && rm -fr opend dub
 
 WORKDIR /app
 
