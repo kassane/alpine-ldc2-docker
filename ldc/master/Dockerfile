@@ -15,7 +15,7 @@ RUN apk update && apk add --no-cache \
         llvm-static \
         llvm-libunwind-static
 
-RUN git clone --recursive https://github.com/kassane/ldc -b musl_fix --depth=1
+RUN git clone --recursive https://github.com/ldc-developers/ldc --depth=1
 RUN cd ldc \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt" \
