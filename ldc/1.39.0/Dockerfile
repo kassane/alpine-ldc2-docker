@@ -3,6 +3,8 @@ ARG BASE_VERSION=latest
 
 FROM ${IMAGE}:${BASE_VERSION}
 
+ENV LDC_VERSION=1.39.0
+
 RUN apk update && apk add --no-cache \
         sudo \
         ldc \
@@ -14,8 +16,8 @@ RUN apk update && apk add --no-cache \
         llvm-static \
         llvm-libunwind-static
 
-RUN wget -q -c https://github.com/ldc-developers/ldc/releases/download/v1.37.0/ldc-1.37.0-src.tar.gz && tar xf ldc-1.37.0-src.tar.gz
-RUN cd ldc-1.37.0-src \
+RUN wget -q -c https://github.com/ldc-developers/ldc/releases/download/v${LDC_VERSION}/ldc-${LDC_VERSION}-src.tar.gz && tar xf ldc-${LDC_VERSION}-src.tar.gz
+RUN cd ldc-${LDC_VERSION}-src \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt" \
     -GNinja \
@@ -28,11 +30,11 @@ RUN cd ldc-1.37.0-src \
     -DBUILD_SHARED_LIBS=BOTH \
     -DBUILD_LTO_LIBS=ON \
     && cmake --build build --parallel \
-    && ninja -C ldc-1.37.0-src/build install
+    && ninja -C ldc-${LDC_VERSION}-src/build install
 
-RUN wget -q -c https://github.com/dlang/dub/archive/refs/tags/v1.37.0.tar.gz \
-    && tar xf v1.37.0.tar.gz \
-    && cd dub-1.37.0 \
+RUN wget -q -c https://github.com/dlang/dub/archive/refs/tags/v${LDC_VERSION}.tar.gz \
+    && tar xf v${LDC_VERSION}.tar.gz \
+    && cd dub-${LDC_VERSION} \
     && dub build -b release --compiler=/opt/bin/ldc2 \
     && chmod +x $PWD/bin/dub \
     && apk del dub \
@@ -49,9 +51,9 @@ RUN apk del ldc llvm-static clang cmake ninja \
 
 RUN apk del cmake ninja \
     && rm -fr \
-    ldc-1.37.0-src \
+    ldc-${LDC_VERSION}-src \
     *.tar.gz \
-    dub-1.37.0
+    dub-${LDC_VERSION}
 
 WORKDIR /app
 
