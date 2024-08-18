@@ -34,14 +34,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Build and push - Alpine [1.39.0]
-        uses: docker/build-push-action@v5
-        with:
-          file: ldc/1.39.0/Dockerfile
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:1.39.0
+      # - name: Build and push - Alpine [1.39.0]
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     file: ldc/1.39.0/Dockerfile
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:1.39.0
 
       - name: Build and push - Alpine [master]
         uses: docker/build-push-action@v5
