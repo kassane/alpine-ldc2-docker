@@ -31,12 +31,12 @@ RUN cd opend/ldc \
     && cmake --build build --parallel \
     && ninja -C build install
 
-RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
-    && cd dub \
-    && dub build -b release --compiler=/opt/bin/ldc2 \
-    && chmod +x $PWD/bin/dub \
-    && apk del dub \
-    && mv $PWD/bin/dub /usr/bin/dub
+# RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
+#     && cd dub \
+#     && dub build -b release --compiler=/opt/bin/ldc2 \
+#     && chmod +x $PWD/bin/dub \
+#     && apk del dub \
+#     && mv $PWD/bin/dub /usr/bin/dub
 
 RUN apk del ldc llvm-static clang cmake ninja git \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
@@ -44,7 +44,7 @@ RUN apk del ldc llvm-static clang cmake ninja git \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
     && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
     && apk add llvm-libunwind-dev musl-dev gcc \
-    && rm -fr opend dub
+    && rm -fr opend
 
 WORKDIR /app
 
