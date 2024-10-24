@@ -7,6 +7,7 @@ ENV LDC_VERSION=1.39.0
 
 RUN apk update && apk add --no-cache \
         sudo \
+        git \
         ldc \
         clang \
         dub \
@@ -16,31 +17,31 @@ RUN apk update && apk add --no-cache \
         llvm-static \
         llvm-libunwind-static
 
-RUN wget -q -c https://github.com/ldc-developers/ldc/releases/download/v${LDC_VERSION}/ldc-${LDC_VERSION}-src.tar.gz && tar xf ldc-${LDC_VERSION}-src.tar.gz
-RUN cd ldc-${LDC_VERSION}-src \
+RUN git clone --recursive https://github.com/ldc-developers/ldc -b v${LDC_VERSION} --depth=1
+RUN cd ldc \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt" \
     -GNinja \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DCMAKE_BUILD_TYPE=Release \
+    -DRT_SUPPORT_SANITIZERS=ON \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
     -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
     -DBUILD_SHARED_LIBS=BOTH \
     -DBUILD_LTO_LIBS=ON \
     && cmake --build build --parallel \
-    && ninja -C ldc-${LDC_VERSION}-src/build install
+    && ninja -C build install
 
-RUN wget -q -c https://github.com/dlang/dub/archive/refs/tags/v${LDC_VERSION}.tar.gz \
-    && tar xf v${LDC_VERSION}.tar.gz \
-    && cd dub-${LDC_VERSION} \
+RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
+    && cd dub \
     && dub build -b release --compiler=/opt/bin/ldc2 \
     && chmod +x $PWD/bin/dub \
     && apk del dub \
     && mv $PWD/bin/dub /usr/bin/dub
 
-RUN apk del ldc llvm-static clang cmake ninja \
+RUN apk del git ldc llvm-static clang cmake ninja \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
