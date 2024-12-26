@@ -3,7 +3,7 @@ ARG BASE_VERSION=latest
 
 FROM ${IMAGE}:${BASE_VERSION}
 
-ENV LDC_VERSION=1.39.0
+ENV LDC_VERSION=1.40.0
 
 RUN apk update && apk add --no-cache \
         sudo \
