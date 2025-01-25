@@ -37,7 +37,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       # - name: Build and push - Alpine [1.41.0]
-      #   uses: docker/build-push-action@v5
+      #   uses: docker/build-push-action@v6
       #   with:
       #     file: ldc/1.41.0/Dockerfile
       #     context: .
@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and push - Alpine [master]
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           file: ldc/master/Dockerfile
           context: .
@@ -75,7 +75,7 @@ jobs:
 
       - name: Build and push - Alpine-openD [master]
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           file: opend-ldc/master/Dockerfile
           context: .
