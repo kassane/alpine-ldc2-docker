@@ -1,6 +1,8 @@
 name: Docker CI
 
 on:
+  pull_request:
+  workflow_dispatch:
   push:
     branches:
       - "main"
@@ -44,6 +46,7 @@ jobs:
       #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:1.41.0
 
       - name: Build and push - Alpine [master]
+        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v5
         with:
           file: ldc/master/Dockerfile
@@ -71,6 +74,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push - Alpine-openD [master]
+        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v5
         with:
           file: opend-ldc/master/Dockerfile
