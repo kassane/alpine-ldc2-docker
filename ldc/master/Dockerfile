@@ -32,6 +32,7 @@ RUN cd ldc \
     -DD_COMPILER_FLAGS="-O -flto=full -link-defaultlib-shared=false" \
     -DRT_SUPPORT_SANITIZERS=ON \
     -DLDC_ENABLE_PLUGINS=OFF \
+    -DBUILD_SHARED_LIBS=BOTH \
     -DLDC_INSTALL_LLVM_RUNTIME_LIBS_ARCH=$(uname -m) \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
@@ -39,6 +40,16 @@ RUN cd ldc \
     -DBUILD_LTO_LIBS=ON \
     && cmake --build build --parallel \
     && ninja -C build install
+
+RUN git clone --recursive https://github.com/dlang/tools --depth=1 dlang-tools \
+    && cd dlang-tools \
+    && mkdir bin \
+    && /opt/bin/ldc2 -O -static -w -de -dip1000 rdmd.d -of=bin/rdmd \
+    && /opt/bin/ldc2 -O -static -w -de -dip1000 ddemangle.d -of=bin/ddemangle \
+    && /opt/bin/ldc2 -O -static -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=bin/dustmite \
+    && cp $PWD/bin/* /opt/bin \
+    && cd .. \
+    && rm -fr dlang-tools
 
 RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
