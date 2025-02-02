@@ -12,6 +12,9 @@ RUN apk update && apk add --no-cache \
         cmake \
         ninja \
         llvm-dev \
+        libxml2-static \
+        zstd-static \
+        zlib-static \
         llvm-static \
         llvm-libunwind-static
 
@@ -23,11 +26,16 @@ RUN cd ldc \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DCMAKE_BUILD_TYPE=Release \
+    -DLDC_FULLY_STATIC=ON \
+    -DLDC_INSTALL_LTOPLUGIN=OFF \
+    -DCOMPILER_RT_LIBDIR_OS=linux \
+    -DD_COMPILER_FLAGS="-O -flto=full -link-defaultlib-shared=false" \
     -DRT_SUPPORT_SANITIZERS=ON \
+    -DLDC_ENABLE_PLUGINS=OFF \
+    -DLDC_INSTALL_LLVM_RUNTIME_LIBS_ARCH=$(uname -m) \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
-    -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
-    -DBUILD_SHARED_LIBS=BOTH \
+    -DLDC_DYNAMIC_COMPILE=OFF \
     -DBUILD_LTO_LIBS=ON \
     && cmake --build build --parallel \
     && ninja -C build install
@@ -39,7 +47,7 @@ RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && apk del dub \
     && mv $PWD/bin/dub /usr/bin/dub
 
-RUN apk del ldc llvm-static clang cmake ninja git \
+RUN apk del ldc llvm-static libxml2-static zstd-static zlib-static clang cmake ninja git \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
