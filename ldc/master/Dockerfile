@@ -44,9 +44,9 @@ RUN cd ldc \
 RUN git clone --recursive https://github.com/dlang/tools --depth=1 dlang-tools \
     && cd dlang-tools \
     && mkdir bin \
-    && /opt/bin/ldc2 -O -static -w -de -dip1000 rdmd.d -of=bin/rdmd \
-    && /opt/bin/ldc2 -O -static -w -de -dip1000 ddemangle.d -of=bin/ddemangle \
-    && /opt/bin/ldc2 -O -static -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=bin/dustmite \
+    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 rdmd.d -of=bin/rdmd \
+    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 ddemangle.d -of=bin/ddemangle \
+    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=bin/dustmite \
     && cp $PWD/bin/* /opt/bin \
     && cd .. \
     && rm -fr dlang-tools
