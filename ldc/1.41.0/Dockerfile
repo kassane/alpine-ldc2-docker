@@ -3,21 +3,29 @@ ARG BASE_VERSION=latest
 
 FROM ${IMAGE}:${BASE_VERSION}
 
-ENV LDC_VERSION=1.40.0
+ENV LDC_VERSION=1.41.0
 
 RUN apk update && apk add --no-cache \
         sudo \
-        git \
         ldc \
+        git \
         clang \
         dub \
         cmake \
         ninja \
+        lld \
         llvm-dev \
+        libxml2-static \
+        zstd-static \
+        zlib-static \
         llvm-static \
-        llvm-libunwind-static
+        llvm-libunwind-static \
+        compiler-rt \
+        curl \
+        curl-dev
 
 RUN git clone --recursive https://github.com/ldc-developers/ldc -b v${LDC_VERSION} --depth=1
+RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld
 RUN cd ldc \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt" \
@@ -25,14 +33,34 @@ RUN cd ldc \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DCMAKE_BUILD_TYPE=Release \
+    -DLDC_FULLY_STATIC=ON \
+    -DLDC_INSTALL_LTOPLUGIN=OFF \
+    -DCOMPILER_RT_LIBDIR_OS=linux \
     -DRT_SUPPORT_SANITIZERS=ON \
+    -DD_COMPILER_FLAGS="-O -flto=full -link-defaultlib-shared=false" \
+    -DEXTRA_CXXFLAGS="-flto=full" \
+    -DCONF_INST_DIR=/etc/ldc \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
+    -DLDC_ENABLE_PLUGINS=OFF \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DLDC_BUNDLE_LLVM_TOOLS=OFF \
+    -DLDC_INSTALL_LLVM_RUNTIME_LIBS_ARCH=$(uname -m) \
     -DLLVM_IS_SHARED=OFF \
-    -DD_COMPILER_FLAGS=-link-defaultlib-shared=false \
-    -DBUILD_SHARED_LIBS=BOTH \
+    -DLDC_DYNAMIC_COMPILE=OFF \
     -DBUILD_LTO_LIBS=ON \
     && cmake --build build --parallel \
     && ninja -C build install
+
+RUN apk del ldc && apk add llvm-libunwind-dev
+RUN git clone --recursive https://github.com/dlang/tools -b stable --depth=1 dlang-tools \
+    && cd dlang-tools \
+    && mkdir bin \
+    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 rdmd.d -of=bin/rdmd \
+    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 ddemangle.d -of=bin/ddemangle \
+    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=bin/dustmite \
+    && cp $PWD/bin/* /opt/bin \
+    && cd .. \
+    && rm -fr dlang-tools
 
 RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
@@ -41,12 +69,12 @@ RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && apk del dub \
     && mv $PWD/bin/dub /usr/bin/dub
 
-RUN apk del git ldc llvm-static clang cmake ninja \
+RUN apk del git llvm-dev llvm-static cmake ninja curl curl-dev libxml2-static zlib-static zstd-static \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
     && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
-    && apk add llvm-libunwind-dev musl-dev gcc \
+    && apk add musl-dev \
     && rm -fr ldc dub
 
 

@@ -8,17 +8,21 @@ RUN apk update && apk add --no-cache \
         ldc \
         git \
         clang \
+        lld \
         dub \
         cmake \
         ninja \
-        llvm-dev \
         libxml2-static \
         zstd-static \
         zlib-static \
+        llvm-dev \
         llvm-static \
+        compiler-rt \
+        curl \
         llvm-libunwind-static
 
 RUN git clone --recursive https://github.com/ldc-developers/ldc --depth=1
+RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld
 RUN cd ldc \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt" \
@@ -29,10 +33,13 @@ RUN cd ldc \
     -DLDC_FULLY_STATIC=ON \
     -DLDC_INSTALL_LTOPLUGIN=OFF \
     -DCOMPILER_RT_LIBDIR_OS=linux \
-    -DD_COMPILER_FLAGS="-O -flto=full -link-defaultlib-shared=false" \
     -DRT_SUPPORT_SANITIZERS=ON \
+    -DD_COMPILER_FLAGS="-O -flto=full -link-defaultlib-shared=false" \
+    -DEXTRA_CXXFLAGS="-flto=full" \
+    -DCONF_INST_DIR=/etc/ldc \
     -DLDC_ENABLE_PLUGINS=OFF \
-    -DBUILD_SHARED_LIBS=BOTH \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DLDC_BUNDLE_LLVM_TOOLS=OFF \
     -DLDC_INSTALL_LLVM_RUNTIME_LIBS_ARCH=$(uname -m) \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
@@ -41,7 +48,8 @@ RUN cd ldc \
     && cmake --build build --parallel \
     && ninja -C build install
 
-RUN git clone --recursive https://github.com/dlang/tools --depth=1 dlang-tools \
+RUN apk del ldc && apk add llvm-libunwind-dev
+RUN git clone --recursive https://github.com/dlang/tools -b stable --depth=1 dlang-tools \
     && cd dlang-tools \
     && mkdir bin \
     && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 rdmd.d -of=bin/rdmd \
@@ -58,12 +66,12 @@ RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && apk del dub \
     && mv $PWD/bin/dub /usr/bin/dub
 
-RUN apk del ldc llvm-static libxml2-static zstd-static zlib-static clang cmake ninja git \
+RUN apk del llvm-static libxml2-static zstd-static zlib-static cmake ninja git curl libxml2-static zlib-static zstd-static \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
     && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
-    && apk add llvm-libunwind-dev musl-dev gcc \
+    && apk add musl-dev \
     && rm -fr ldc dub
 
 WORKDIR /app

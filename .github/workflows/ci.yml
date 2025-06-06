@@ -36,24 +36,24 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      # - name: Build and push - Alpine [1.41.0]
-      #   uses: docker/build-push-action@v6
-      #   with:
-      #     file: ldc/1.41.0/Dockerfile
-      #     context: .
-      #     platforms: linux/amd64,linux/arm64
-      #     push: true
-      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:1.41.0
-
-      - name: Build and push - Alpine [master]
-        if: github.ref == 'refs/heads/main'
+      - name: Build and push - Alpine [1.41.0]
         uses: docker/build-push-action@v6
         with:
-          file: ldc/master/Dockerfile
+          file: ldc/1.41.0/Dockerfile
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:1.41.0
+
+      # - name: Build and push - Alpine [master]
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     file: ldc/master/Dockerfile
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:latest
 
   opend-ldc:
     name: OpenD-LDC CI
@@ -61,27 +61,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Apply workaround for sudo bug (https://github.com/multiarch/qemu-user-static/issues/17)
-        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
+      # - name: Apply workaround for sudo bug (https://github.com/multiarch/qemu-user-static/issues/17)
+      #   run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v3
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push - Alpine-openD [master]
-        if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v6
-        with:
-          file: opend-ldc/master/Dockerfile
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-opend:latest
+      # - name: Build and push - Alpine-openD [master]
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     file: opend-ldc/master/Dockerfile
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-opend:latest
 
   keepalive-job:
     name: Keepalive Workflow
