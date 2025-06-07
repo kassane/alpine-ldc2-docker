@@ -7,6 +7,7 @@ Building LDC2 (LLVM D Compiler) and OpenD-LDC upstream
 #### Tags = version
 
 - `latest`: `master`
+- `1.41.0`: `v1.41.0` **ldc2 only**
 - `1.40.0`: `v1.40.0` **ldc2 only**
 - `1.39.0`: `v1.39.0` **ldc2 only**
 
