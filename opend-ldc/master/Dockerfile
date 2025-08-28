@@ -1,7 +1,7 @@
 ARG IMAGE=alpine
 ARG BASE_VERSION=3.20.3
 
-FROM ${IMAGE}:${BASE_VERSION}
+FROM ${IMAGE}:${BASE_VERSION} AS builder
 
 RUN apk update && apk add --no-cache \
         sudo \
@@ -31,20 +31,27 @@ RUN cd opend/ldc \
     && cmake --build build --parallel \
     && ninja -C build install
 
-# RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
-#     && cd dub \
-#     && dub build -b release --compiler=/opt/bin/ldc2 \
-#     && chmod +x $PWD/bin/dub \
-#     && apk del dub \
-#     && mv $PWD/bin/dub /usr/bin/dub
+RUN apk del ldc llvm-static clang cmake ninja git
 
-RUN apk del ldc llvm-static clang cmake ninja git \
+FROM ${IMAGE}:${BASE_VERSION}
+
+RUN apk update && apk add --no-cache \
+        sudo \
+        clang \
+        lld \
+        dub \
+        compiler-rt \
+        llvm-libunwind-static \
+        llvm-libunwind-dev \
+        musl-dev
+
+COPY --from=builder /opt /opt
+
+RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
-    && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
-    && apk add llvm-libunwind-dev musl-dev gcc \
-    && rm -fr opend
+    && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
 
 WORKDIR /app
 
@@ -59,8 +66,8 @@ RUN adduser \
     --ingroup "$UNAME" \
     --no-create-home \
     --uid "$UID" \
-    "$UNAME"
-RUN echo "$UNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$UNAME \
-        && chmod 0440 /etc/sudoers.d/$UNAME
-RUN chown -R $UNAME:$UNAME /app
+    "$UNAME" \
+    && echo "$UNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$UNAME \
+    && chmod 0440 /etc/sudoers.d/$UNAME \
+    && chown -R $UNAME:$UNAME /app
 USER $UNAME

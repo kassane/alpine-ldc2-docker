@@ -79,6 +79,7 @@ RUN apk update && apk add --no-cache \
 
 COPY --from=builder /opt /opt
 COPY --from=builder /usr/bin/dub /usr/bin/dub
+COPY --from=builder /etc/ldc /etc/ldc
 
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
