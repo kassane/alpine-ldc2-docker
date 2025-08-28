@@ -37,6 +37,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       # - name: Build and push - Alpine [1.41.0]
+      #   if: github.ref == 'refs/heads/main'
       #   uses: docker/build-push-action@v6
       #   with:
       #     file: ldc/1.41.0/Dockerfile

@@ -1,10 +1,9 @@
 ARG IMAGE=alpine
 ARG BASE_VERSION=latest
 
-FROM ${IMAGE}:${BASE_VERSION}
+FROM ${IMAGE}:${BASE_VERSION} AS builder
 
 RUN apk update && apk add --no-cache \
-        sudo \
         ldc \
         git \
         clang \
@@ -55,40 +54,54 @@ RUN git clone --recursive https://github.com/dlang/tools -b stable --depth=1 dla
     && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 rdmd.d -of=bin/rdmd \
     && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 ddemangle.d -of=bin/ddemangle \
     && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=bin/dustmite \
-    && cp $PWD/bin/* /opt/bin \
+    && cp bin/* /opt/bin \
     && cd .. \
     && rm -fr dlang-tools
-
 RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
     && dub build -b release --compiler=/opt/bin/ldc2 \
-    && chmod +x $PWD/bin/dub \
+    && chmod +x bin/dub \
     && apk del dub \
-    && mv $PWD/bin/dub /usr/bin/dub
+    && mv bin/dub /usr/bin/dub \
+    && cd .. \
+    && rm -fr dub ldc
 
-RUN apk del llvm-static libxml2-static zstd-static zlib-static cmake ninja git curl libxml2-static zlib-static zstd-static \
+FROM ${IMAGE}:${BASE_VERSION}
+
+RUN apk update && apk add --no-cache \
+        sudo \
+        clang \
+        lld \
+        compiler-rt \
+        llvm-libunwind-static \
+        llvm-libunwind-dev \
+        musl-dev
+
+COPY --from=builder /opt /opt
+COPY --from=builder /usr/bin/dub /usr/bin/dub
+COPY --from=builder /etc/ldc /etc/ldc
+
+RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
     && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
-    && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime \
-    && apk add musl-dev \
-    && rm -fr ldc dub
+    && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
 
 WORKDIR /app
 
 ARG UNAME=ldc
 ARG UID=1000
 ARG GID=1000
-RUN addgroup -S $UNAME
-RUN adduser \
+RUN addgroup -S $UNAME \
+    && adduser \
     --disabled-password \
     --gecos "" \
     --home "$(pwd)" \
     --ingroup "$UNAME" \
     --no-create-home \
     --uid "$UID" \
-    "$UNAME"
-RUN echo "$UNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$UNAME \
-        && chmod 0440 /etc/sudoers.d/$UNAME
-RUN chown -R $UNAME:$UNAME /app
+    "$UNAME" \
+    && echo "$UNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$UNAME \
+    && chmod 0440 /etc/sudoers.d/$UNAME \
+    && chown -R $UNAME:$UNAME /app
 USER $UNAME
