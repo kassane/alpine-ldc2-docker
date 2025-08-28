@@ -46,7 +46,7 @@ jobs:
       #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-ldc2:1.41.0
 
       - name: Build and push - Alpine [master]
-        if: github.ref == 'refs/heads/main'
+        #if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v6
         with:
           file: ldc/master/Dockerfile
