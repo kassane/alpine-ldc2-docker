@@ -35,7 +35,6 @@ RUN cd ldc \
     -DRT_SUPPORT_SANITIZERS=ON \
     -DD_COMPILER_FLAGS="-O -flto=full -link-defaultlib-shared=false" \
     -DEXTRA_CXXFLAGS="-flto=full" \
-    -DCONF_INST_DIR=/etc/ldc \
     -DLDC_ENABLE_PLUGINS=OFF \
     -DBUILD_SHARED_LIBS=OFF \
     -DLDC_BUNDLE_LLVM_TOOLS=OFF \
@@ -79,7 +78,6 @@ RUN apk update && apk add --no-cache \
 
 COPY --from=builder /opt /opt
 COPY --from=builder /usr/bin/dub /usr/bin/dub
-COPY --from=builder /etc/ldc /etc/ldc
 
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld \
     && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
