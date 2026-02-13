@@ -17,8 +17,7 @@ RUN apk update && apk add --no-cache \
         llvm-dev \
         llvm-static \
         compiler-rt \
-        curl \
-        llvm-libunwind-static
+        curl
 
 RUN git clone --recursive https://github.com/ldc-developers/ldc --depth=1
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld
@@ -33,13 +32,14 @@ RUN cd ldc \
     -DLDC_INSTALL_LTOPLUGIN=OFF \
     -DCOMPILER_RT_LIBDIR_OS=linux \
     -DRT_SUPPORT_SANITIZERS=ON \
-    -DD_COMPILER_FLAGS="-O -flto=full -link-defaultlib-shared=false" \
+    -DD_COMPILER_FLAGS="-O -flto=full -defaultlib=phobos2-ldc-lto,druntime-ldc-lto" \
     -DEXTRA_CXXFLAGS="-flto=full" \
     -DLDC_ENABLE_PLUGINS=OFF \
     -DBUILD_SHARED_LIBS=OFF \
     -DLDC_BUNDLE_LLVM_TOOLS=OFF \
     -DLDC_INSTALL_LLVM_RUNTIME_LIBS_ARCH=$(uname -m) \
     -DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ \
+    -DJITRT_EXTRA_LDFLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
     -DLDC_DYNAMIC_COMPILE=OFF \
     -DBUILD_LTO_LIBS=ON \
@@ -70,8 +70,7 @@ FROM ${IMAGE}:${BASE_VERSION}
 RUN apk update && apk add --no-cache \
         sudo \
         lld \
-        gcc \
-        llvm-libunwind-static
+        gcc
 
 COPY --from=builder /opt/ldc-master /opt/ldc-master
 
