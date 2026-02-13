@@ -66,7 +66,6 @@ RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
     && dub build -b release --compiler=/opt/ldc-master/bin/ldc2 \
     && chmod +x bin/dub \
-    && apk del dub \
     && mv bin/dub /opt/ldc-master/bin/dub \
     && cd .. \
     && rm -fr dub ldc
