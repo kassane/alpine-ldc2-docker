@@ -32,7 +32,7 @@ RUN cd ldc \
     -DLDC_INSTALL_LTOPLUGIN=OFF \
     -DCOMPILER_RT_LIBDIR_OS=linux \
     -DRT_SUPPORT_SANITIZERS=ON \
-    -DD_COMPILER_FLAGS="-O -flto=full -defaultlib=phobos2-ldc-lto,druntime-ldc-lto" \
+    -DD_COMPILER_FLAGS="-O -flto=full" \
     -DEXTRA_CXXFLAGS="-flto=full" \
     -DLDC_ENABLE_PLUGINS=OFF \
     -DBUILD_SHARED_LIBS=OFF \
