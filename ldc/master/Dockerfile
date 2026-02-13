@@ -24,7 +24,7 @@ RUN git clone --recursive https://github.com/ldc-developers/ldc --depth=1
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld
 RUN cd ldc \
     && cmake -B build \
-    -DCMAKE_INSTALL_PREFIX="/opt" \
+    -DCMAKE_INSTALL_PREFIX="/opt/ldc-master" \
     -GNinja \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
@@ -50,18 +50,18 @@ RUN apk del ldc && apk add llvm-libunwind-dev
 RUN git clone --recursive https://github.com/dlang/tools -b stable --depth=1 dlang-tools \
     && cd dlang-tools \
     && mkdir bin \
-    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 rdmd.d -of=bin/rdmd \
-    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 ddemangle.d -of=bin/ddemangle \
-    && /opt/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=bin/dustmite \
-    && cp bin/* /opt/bin \
+    && /opt/ldc-master/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 rdmd.d -of=bin/rdmd \
+    && /opt/ldc-master/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 ddemangle.d -of=bin/ddemangle \
+    && /opt/ldc-master/bin/ldc2 -O -static -cleanup-obj -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=bin/dustmite \
+    && cp bin/* /opt/ldc-master/bin \
     && cd .. \
     && rm -fr dlang-tools
 RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
-    && dub build -b release --compiler=/opt/bin/ldc2 \
+    && dub build -b release --compiler=/opt/ldc-master/bin/ldc2 \
     && chmod +x bin/dub \
     && apk del dub \
-    && mv bin/dub /usr/bin/dub \
+    && mv bin/dub /opt/ldc-master/bin/dub \
     && cd .. \
     && rm -fr dub ldc
 
@@ -69,21 +69,18 @@ FROM ${IMAGE}:${BASE_VERSION}
 
 RUN apk update && apk add --no-cache \
         sudo \
-        clang \
         lld \
-        compiler-rt \
-        llvm-libunwind-static \
-        llvm-libunwind-dev \
-        musl-dev
+        gcc \
+        llvm-libunwind-static
 
-COPY --from=builder /opt /opt
-COPY --from=builder /usr/bin/dub /usr/bin/dub
+COPY --from=builder /opt/ldc-master /opt/ldc-master
 
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld \
-    && ln -s /opt/bin/ldc2 /usr/bin/ldc2 \
-    && ln -s /opt/bin/ldmd2 /usr/bin/ldmd2 \
-    && ln -s /opt/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
-    && ln -s /opt/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
+    && ln -s /opt/ldc-master/bin/ldc2 /usr/bin/ldc2 \
+    && ln -s /opt/ldc-master/bin/ldmd2 /usr/bin/ldmd2 \
+    && ln -s /opt/ldc-master/bin/dub /usr/bin/dub \
+    && ln -s /opt/ldc-master/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
+    && ln -s /opt/ldc-master/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
 
 WORKDIR /app
 
