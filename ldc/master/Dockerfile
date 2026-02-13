@@ -7,7 +7,6 @@ RUN apk update && apk add --no-cache \
         git \
         clang \
         lld \
-        dub \
         cmake \
         ninja \
         libxml2-static \
@@ -18,7 +17,7 @@ RUN apk update && apk add --no-cache \
         compiler-rt \
         curl
 
-RUN curl -LO https://github.com/ldc-developers/ldc/releases/download/v1.42.0-beta2/ldc2-1.42.0-beta2-alpine-$(uname -m).tar.xz \
+RUN curl -sLO https://github.com/ldc-developers/ldc/releases/download/v1.42.0-beta2/ldc2-1.42.0-beta2-alpine-$(uname -m).tar.xz \
     && tar xf ldc2-1.42.0-beta2-alpine-$(uname -m).tar.xz --directory /opt \
     && ln -s /opt/ldc2-1.42.0-beta2-alpine-$(uname -m)/bin/ldc2 /usr/bin/ldc2 \
     && ln -s /opt/ldc2-1.42.0-beta2-alpine-$(uname -m)/bin/ldmd2 /usr/bin/ldmd2 \
