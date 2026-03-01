@@ -4,6 +4,8 @@ ARG BASE_VERSION=latest
 FROM ${IMAGE}:${BASE_VERSION} AS builder
 
 RUN apk update && apk add --no-cache \
+        xz \
+        tar \
         git \
         clang \
         lld \
@@ -17,13 +19,13 @@ RUN apk update && apk add --no-cache \
         compiler-rt \
         curl
 
-RUN curl -sLO https://github.com/ldc-developers/ldc/releases/download/v1.42.0-beta2/ldc2-1.42.0-beta2-alpine-$(uname -m).tar.xz \
-    && tar xf ldc2-1.42.0-beta2-alpine-$(uname -m).tar.xz --directory /opt \
-    && ln -s /opt/ldc2-1.42.0-beta2-alpine-$(uname -m)/bin/ldc2 /usr/bin/ldc2 \
-    && ln -s /opt/ldc2-1.42.0-beta2-alpine-$(uname -m)/bin/ldmd2 /usr/bin/ldmd2 \
-    && ln -s /opt/ldc2-1.42.0-beta2-alpine-$(uname -m)/bin/dub /usr/bin/dub \
-    && ln -s /opt/ldc2-1.42.0-beta2-alpine-$(uname -m)/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
-    && ln -s /opt/ldc2-1.42.0-beta2-alpine-$(uname -m)/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
+RUN curl -sLO --fail https://github.com/ldc-developers/ldc/releases/download/v1.42.0/ldc2-1.42.0-alpine-$(uname -m).tar.xz \
+    && tar xf ldc2-1.42.0-alpine-$(uname -m).tar.xz --directory /opt \
+    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldc2 /usr/bin/ldc2 \
+    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldmd2 /usr/bin/ldmd2 \
+    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/dub /usr/bin/dub \
+    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
+    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
 
 RUN git clone --recursive https://github.com/ldc-developers/ldc --depth=1
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld
