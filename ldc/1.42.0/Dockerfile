@@ -70,7 +70,7 @@ RUN git clone --recursive https://github.com/dlang/tools -b stable --depth=1 dla
 
 RUN git clone --recursive https://github.com/dlang/dub --depth=1 \
     && cd dub \
-    && dub build -b release --compiler=/opt/ldc-master/bin/ldc2 \
+    && DFLAGS="-L-static" dub build -b release --compiler=/opt/ldc-master/bin/ldc2 \
     && chmod +x bin/dub \
     && mv bin/dub /usr/bin/dub \
     && cd .. \
@@ -83,7 +83,7 @@ RUN apk update && apk add --no-cache \
         gcc \
         lld
 
-COPY --from=builder /opt /opt
+COPY --from=builder /opt/ldc-master /opt/ldc-master
 COPY --from=builder /usr/bin/dub /usr/bin/dub
 
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld \
