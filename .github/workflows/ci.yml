@@ -38,7 +38,7 @@ jobs:
       
       # - name: Build and push - Alpine [1.42.0]
       #   if: github.ref == 'refs/heads/main'
-      #   uses: docker/build-push-action@v6
+      #   uses: docker/build-push-action@v7
       #   with:
       #     file: ldc/1.42.0/Dockerfile
       #     context: .
@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and push - Alpine [master]
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           file: ldc/master/Dockerfile
           context: .
@@ -76,7 +76,7 @@ jobs:
 
       - name: Build and push - Alpine-openD [master]
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           file: opend-ldc/master/Dockerfile
           context: .
