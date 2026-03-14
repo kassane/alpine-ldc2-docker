@@ -1,6 +1,7 @@
 ARG IMAGE=alpine
 ARG BASE_VERSION=latest
 ARG LLVM_VERSION="release/esp_21.x"
+ARG LDC_VERSION="master"
 
 # Build llvm-xtensa
 FROM ${IMAGE}:${BASE_VERSION} AS builder-llvm-xtensa
