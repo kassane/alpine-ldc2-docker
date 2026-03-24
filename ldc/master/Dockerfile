@@ -19,16 +19,17 @@ RUN apk update && apk add --no-cache \
         compiler-rt \
         curl
 
-RUN curl -sLO --fail https://github.com/ldc-developers/ldc/releases/download/v1.42.0/ldc2-1.42.0-alpine-$(uname -m).tar.xz \
-    && tar xf ldc2-1.42.0-alpine-$(uname -m).tar.xz --directory /opt \
-    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldc2 /usr/bin/ldc2 \
-    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldmd2 /usr/bin/ldmd2 \
-    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/dub /usr/bin/dub \
-    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
-    && ln -s /opt/ldc2-1.42.0-alpine-$(uname -m)/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
+RUN curl -sLO --fail https://archive.org/download/ldc2-riscv64-linux-musl.tar/ldc2-riscv64-linux-musl.tar.xz \
+    && tar xf ldc2-riscv64-linux-musl.tar.xz --directory /opt \
+    && ln -s /opt/ldc2-riscv64-linux-musl/bin/ldc2 /usr/bin/ldc2 \
+    && ln -s /opt/ldc2-riscv64-linux-musl/bin/ldmd2 /usr/bin/ldmd2 \
+    && ln -s /opt/ldc2-riscv64-linux-musl/bin/dub /usr/bin/dub \
+    && ln -s /opt/ldc2-riscv64-linux-musl/bin/ldc-build-plugin /usr/bin/ldc-build-plugin \
+    && ln -s /opt/ldc2-riscv64-linux-musl/bin/ldc-build-runtime /usr/bin/ldc-build-runtime
 
 RUN git clone --recursive https://github.com/ldc-developers/ldc --depth=1
 RUN ln -sf /usr/bin/ld.lld /usr/$(uname -m)-alpine-linux-musl/bin/ld
+RUN cp /opt/ldc2-riscv64-linux-musl/include/d/core/stdc/fenv.d ldc/runtime/druntime/src/core/stdc/fenv.d
 RUN cd ldc \
     && cmake -B build \
     -DCMAKE_INSTALL_PREFIX="/opt/ldc-master" \
@@ -40,8 +41,7 @@ RUN cd ldc \
     -DLDC_INSTALL_LTOPLUGIN=OFF \
     -DCOMPILER_RT_LIBDIR_OS=linux \
     -DRT_SUPPORT_SANITIZERS=ON \
-    -DD_COMPILER_FLAGS="-O -flto=full -defaultlib=phobos2-ldc-lto,druntime-ldc-lto" \
-    -DEXTRA_CXXFLAGS="-flto=full" \
+    -DD_COMPILER_FLAGS="-O" \
     -DLDC_ENABLE_PLUGINS=OFF \
     -DBUILD_SHARED_LIBS=OFF \
     -DLDC_BUNDLE_LLVM_TOOLS=OFF \
@@ -50,11 +50,11 @@ RUN cd ldc \
     -DJITRT_EXTRA_LDFLAGS=-static-libstdc++ \
     -DLLVM_IS_SHARED=OFF \
     -DLDC_DYNAMIC_COMPILE=OFF \
-    -DBUILD_LTO_LIBS=ON \
+    -DBUILD_LTO_LIBS=OFF \
     && cmake --build build --parallel \
     && ninja -C build install
 
-RUN apk del ldc && apk add llvm-libunwind-dev
+RUN apk add llvm-libunwind-dev
 RUN git clone --recursive https://github.com/dlang/tools -b stable --depth=1 dlang-tools \
     && cd dlang-tools \
     && mkdir bin \
