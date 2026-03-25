@@ -100,7 +100,7 @@ RUN cd ldc && \
     cmake --build build --parallel "$(nproc)" && \
     ninja -C build install
 
-RUN apk del ldc && apk add llvm-libunwind-dev
+RUN apk add llvm-libunwind-dev
 RUN git clone --recursive https://github.com/dlang/tools -b stable --depth=1 dlang-tools \
     && cd dlang-tools \
     && mkdir bin \
